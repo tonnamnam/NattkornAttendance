@@ -14,7 +14,7 @@ router = APIRouter(dependencies=[Depends(require_admin)])
 
 @router.post("", response_model=AccountRead, status_code=status.HTTP_201_CREATED)
 def create_account_endpoint(payload: AccountCreate, db: Session = Depends(get_db)):
-    return get_or_create_account(db, payload.line_user_id)
+    return get_or_create_account(db, payload.line_user_id, role=payload.role)
 
 
 @router.get("", response_model=list[AccountRead])

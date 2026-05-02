@@ -33,10 +33,26 @@ Supported events:
 ## Attendance Flow
 
 1. User taps `Check-in` in LINE.
-2. If the LINE account has no students, the bot asks them to contact an admin.
+2. The system finds students linked through `account_students`.
+3. If the LINE account has no linked students, the bot asks them to contact an admin.
 3. If there are multiple students, the bot asks the user to select one.
 4. The bot asks the user to select a class.
 5. The system saves attendance and prevents duplicate check-ins for the same student, class, and day.
+
+## Account And Student Linking
+
+`Account` means a LINE account. `Student` means the real student profile. They are connected through `account_students`, so the same student can be linked to their own LINE account and parent LINE accounts.
+
+Example:
+
+```text
+Student: Nattakorn
+- Account A relationship=self
+- Account B relationship=parent
+- Account C relationship=parent
+```
+
+One account can also be linked to multiple students.
 
 ## Admin Endpoints
 
@@ -51,6 +67,8 @@ Useful endpoints:
 - `POST /accounts`
 - `GET /accounts`
 - `POST /students`
+- `POST /students/with-account`
+- `POST /students/link`
 - `POST /classes`
 - `POST /admin/broadcast`
 - `GET /report/attendance?start_date=2026-05-01&end_date=2026-05-31`
@@ -61,13 +79,21 @@ Useful endpoints:
 accounts
 - id
 - line_user_id
+- role
 - created_at
 
 students
 - id
 - name
-- account_id -> accounts.id
 - created_at
+
+account_students
+- id
+- account_id -> accounts.id
+- student_id -> students.id
+- relationship
+- created_at
+- unique(account_id, student_id)
 
 classes
 - id

@@ -14,7 +14,7 @@ from app.services.line_client import (
     text_message,
     verify_signature,
 )
-from app.services.student_service import get_student, list_students_by_account
+from app.services.student_service import account_can_access_student, get_student, list_students_by_account
 
 
 router = APIRouter()
@@ -94,7 +94,7 @@ def start_check_in(db: Session, reply_token: str, account_id: int) -> None:
 
 def send_class_selector(db: Session, reply_token: str, account_id: int, student_id: int) -> None:
     student = get_student(db, student_id)
-    if not student or student.account_id != account_id:
+    if not student or not account_can_access_student(db, account_id=account_id, student_id=student_id):
         reply_message(reply_token, [text_message("Student not found for this LINE account.")])
         return
 
@@ -110,7 +110,7 @@ def finish_check_in(db: Session, reply_token: str, account_id: int, student_id: 
     student = get_student(db, student_id)
     training_class = get_class(db, class_id)
 
-    if not student or student.account_id != account_id:
+    if not student or not account_can_access_student(db, account_id=account_id, student_id=student_id):
         reply_message(reply_token, [text_message("Student not found for this LINE account.")])
         return
 
