@@ -37,12 +37,28 @@ def text_message(text: str) -> dict:
 def check_in_button_message() -> dict:
     return {
         "type": "template",
-        "altText": "Taekwondo attendance menu",
+        "altText": "เมนูเช็กชื่อเข้าเรียน",
         "template": {
             "type": "buttons",
-            "title": "Taekwondo Attendance",
-            "text": "Ready for class?",
-            "actions": [{"type": "postback", "label": "Check-in", "data": "action=checkin"}],
+            "title": "เมนูผู้ปกครอง",
+            "text": "เลือกสิ่งที่ต้องการทำ",
+            "actions": [
+                {"type": "postback", "label": "เช็กชื่อเข้าเรียน", "data": "action=checkin"},
+                {"type": "postback", "label": "เพิ่มบุตรหลาน", "data": "action=request_access_code"},
+            ],
+        },
+    }
+
+
+def ask_access_code_message() -> dict:
+    return {
+        "type": "template",
+        "altText": "กรอกรหัสเข้าใช้งานของลูก",
+        "template": {
+            "type": "buttons",
+            "title": "เชื่อมบัญชี LINE",
+            "text": "รหัสเข้าใช้งานของลูกคุณคืออะไร กรุณาพิมพ์รหัสที่ได้รับจากครู",
+            "actions": [{"type": "postback", "label": "วิธีหารหัส", "data": "action=access_code_help"}],
         },
     }
 
@@ -54,11 +70,11 @@ def student_selector_message(students: list[Student]) -> dict:
     ]
     return {
         "type": "template",
-        "altText": "Select student",
+        "altText": "เลือกนักเรียน",
         "template": {
             "type": "buttons",
-            "title": "Select Student",
-            "text": "Who is checking in?",
+            "title": "เลือกนักเรียน",
+            "text": "ต้องการเช็กชื่อให้ใคร",
             "actions": actions,
         },
     }
@@ -75,11 +91,11 @@ def class_selector_message(classes: list[TrainingClass], student_id: int) -> dic
     ]
     return {
         "type": "template",
-        "altText": "Select class",
+        "altText": "เลือกคลาสเรียน",
         "template": {
             "type": "buttons",
-            "title": "Select Class",
-            "text": "Choose today's class",
+            "title": "เลือกคลาสเรียน",
+            "text": "วันนี้เข้าเรียนคลาสไหน",
             "actions": actions,
         },
     }

@@ -11,6 +11,7 @@ class Student(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(120), index=True, nullable=False)
+    access_code: Mapped[str | None] = mapped_column(String(32), unique=True, index=True, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     account_links: Mapped[list["AccountStudent"]] = relationship(back_populates="student", cascade="all, delete-orphan")

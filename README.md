@@ -27,17 +27,20 @@ https://YOUR_DOMAIN/line/webhook
 
 Supported events:
 
-- `follow`: creates an `Account` by `line_user_id`
+- `follow`: creates an `Account` by `line_user_id` and asks for the child's access code
+- `message`: treats text as a student access code and links the parent LINE account
 - `postback`: handles `checkin`, `select_student`, and `select_class`
 
 ## Attendance Flow
 
-1. User taps `Check-in` in LINE.
-2. The system finds students linked through `account_students`.
-3. If the LINE account has no linked students, the bot asks them to contact an admin.
-3. If there are multiple students, the bot asks the user to select one.
-4. The bot asks the user to select a class.
-5. The system saves attendance and prevents duplicate check-ins for the same student, class, and day.
+1. A parent follows/adds the LINE bot.
+2. The bot asks for the child's access code in Thai.
+3. The parent types the code they received from the teacher.
+4. The system finds the matching student by `students.access_code` and links the LINE account through `account_students`.
+5. The parent taps `เช็กชื่อเข้าเรียน`.
+6. If there are multiple students, the bot asks the parent to select one.
+7. The bot asks the parent to select a class.
+8. The system saves attendance and prevents duplicate check-ins for the same student, class, and day.
 
 ## Account And Student Linking
 
@@ -47,12 +50,15 @@ Example:
 
 ```text
 Student: Nattakorn
+- access_code=NKT0001
 - Account A relationship=self
 - Account B relationship=parent
 - Account C relationship=parent
 ```
 
 One account can also be linked to multiple students.
+
+When creating students through `POST /students` or `POST /students/with-account`, `access_code` is optional. If omitted, the system generates a unique 6-character code. Existing SQLite databases are updated on startup and old students receive codes like `NKT0001`.
 
 ## Admin Endpoints
 
@@ -85,6 +91,7 @@ accounts
 students
 - id
 - name
+- access_code
 - created_at
 
 account_students

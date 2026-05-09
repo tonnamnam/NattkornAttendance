@@ -3,6 +3,7 @@ from fastapi import FastAPI
 import app.models  # noqa: F401
 from app.api import api_router
 from app.core.config import settings
+from app.db.migrations import ensure_student_access_codes
 from app.db.session import Base, engine
 
 
@@ -16,6 +17,7 @@ def create_app() -> FastAPI:
     @app.on_event("startup")
     def on_startup() -> None:
         Base.metadata.create_all(bind=engine)
+        ensure_student_access_codes(engine)
 
     @app.get("/")
     def root() -> dict[str, str]:

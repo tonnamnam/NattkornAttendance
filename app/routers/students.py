@@ -13,6 +13,7 @@ from app.schemas.student import (
 )
 from app.services.student_service import (
     DuplicateAccountStudentLinkError,
+    DuplicateStudentAccessCodeError,
     create_student,
     get_student,
     link_account_to_student,
@@ -24,7 +25,10 @@ router = APIRouter()
 
 @router.post("", response_model=StudentRead, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_admin)])
 def create_student_endpoint(payload: StudentCreate, db: Session = Depends(get_db)):
-    return create_student(db, name=payload.name)
+    try:
+        return create_student(db, name=payload.name, access_code=payload.access_code)
+    except DuplicateStudentAccessCodeError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
 
 
 @router.post(
@@ -38,7 +42,10 @@ def create_student_with_account_endpoint(payload: StudentWithAccountCreate, db: 
     if not account:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found.")
 
-    student = create_student(db, name=payload.name)
+    try:
+        student = create_student(db, name=payload.name, access_code=payload.access_code)
+    except DuplicateStudentAccessCodeError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
     link_account_to_student(db, account_id=payload.account_id, student_id=student.id, relationship=payload.relationship)
     return student
 
